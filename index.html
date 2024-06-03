@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File to URL Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: url('https://www.example.com/your-background-image.jpg') no-repeat center center fixed; 
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+        .container {
+            background: linear-gradient(135deg, #ff0000, #000000);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        #file-input {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            font-size: 1em;
+            outline: none;
+            width: calc(100% - 100px);
+            display: inline-block;
+            transition: background 0.8;
+        }
+        
+        #file-input:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #990000, #660000);
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .button::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: width 0.3s, height 0.3s, top 0.3s, left 0.3s;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+        .button:hover::before {
+            width: 0;
+            height: 0;
+            top: 50%;
+            left: 50%;
+        }
+        .button:hover {
+            background: linear-gradient(135deg, #660000, #990000);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        #clear-btn, #back-btn, #download-btn, #share-btn {
+            color: white;
+        }
+        #clear-btn:hover, #back-btn:hover, #download-btn:hover, #share-btn:hover {
+            color: white;
+        }
+        #clear-btn::before, #back-btn::before, #download-btn::before, #share-btn::before {
+            color: white;
+        }
+        #clear-btn:hover::before, #back-btn:hover::before, #download-btn:hover::before, #share-btn:hover::before {
+            color: white;
+        }
+        #clear-btn {
+            margin-left: 10px;
+        }
+        #url-output {
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            color: #fff;
+            word-break: break-all;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+        #url-output a {
+            color: #03a9f4;
+            text-decoration: none;
+        }
+        #url-output a:hover {
+            text-decoration: underline;
+        }
+        #download-btn, #back-btn, #share-btn {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="input-container">
+        <h1>File to URL Converter</h1>
+        <input type="file" id="file-input" accept=".txt, .pdf, .doc, .docx, .jpg, .jpeg, .png">
+        <button id="clear-btn" class="button"><i class="fas fa-trash-alt"></i> Clear</button>
+        
+        <div id="url-output"></div>
+    </div>
+
+    <button id="back-btn" class="button" style="display: none;"><i class="fas fa-arrow-left"></i> Back</button>
+    <button id="download-btn" class="button" style="display: none;"><i class="fas fa-download"></i> Download</button>
+ 
+
+    <button id="share-btn" class="button" style="display: none;">Share via Email</button>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const urlOutput = document.getElementById('url-output');
+        const clearButton = document.getElementById('clear-btn');
+        const backButton = document.getElementById('back-btn');
+        const downloadButton = document.getElementById('download-btn');
+        const shareButton = document.getElementById('share-btn');
+        const inputContainer = document.getElementById('input-container');
+
+     
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                urlOutput.innerHTML = `<strong>URL:</strong> <a href="${url}" target="_blank">${url}</a>`;
+                
+                // Automatically copy URL to clipboard
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('URL copied to clipboard');
+                }).catch(err => {
+                    console.error('Failed to copy URL: ', err);
+                });
+
+                // Set up download button
+                downloadButton.href = url;
+                downloadButton.download = file.name;
+                
+                inputContainer.style.display = 'none';
+                backButton.style.display = 'block';
+                downloadButton.style.display = 'block';
+                shareButton.style.display = 'block';
+                
+                // Set up share button
+                shareButton.addEventListener('click', () => {
+                    const subject = encodeURIComponent('Check out this file');
+                    const body = encodeURIComponent(`Here is the file you requested: ${url}`);
+                    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=&su=${subject}&body=${body}`, '_blank');
+                });
+            } else {
+                urlOutput.textContent = '';
+            }
+        });
+
+        clearButton.addEventListener('click', () => {
+            fileInput.value = ''; // Clear the selected file
+            urlOutput.textContent = ''; // Clear the URL output
+        });
+
+        backButton.addEventListener('click', () => {
+            inputContainer.style.display = 'block';
+            backButton.style.display = 'none';
+            downloadButton.style.display = 'none';
+            shareButton.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
